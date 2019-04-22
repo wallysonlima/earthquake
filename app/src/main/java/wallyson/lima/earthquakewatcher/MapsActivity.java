@@ -12,6 +12,12 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,11 +27,18 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import wallyson.lima.earthquakewatcher.Util.Constants;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private RequestQueue queue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +48,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        queue = Volley.newRequestQueue(this);
+
+        getEarthQuakes();
     }
 
 
@@ -128,5 +145,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         }
+    }
+
+    // Get all Earthquake Objects
+    public void getEarthQuakes() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Constants.URL,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray features = response.getJSONArray("features");
+
+                            for (int i = 0; i < Constants.LIMIT; i++ ) {
+                                JSONObject properties = features.getJSONObject(i).getJSONObject("properties");
+
+                                // Get geometry object
+                                JSONObject geometry = features.getJSONObject(i).getJSONObject("geometry");
+
+                                // get coordinates array
+                                JSONArray coordinates = geometry.getJSONArray("coordinates");
+
+                                double lon = coordinates.getDouble(0);
+                                double lat = coordinates.getDouble(1);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        queue.add(jsonObjectRequest);
     }
 }
