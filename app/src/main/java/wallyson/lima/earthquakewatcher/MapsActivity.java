@@ -18,19 +18,26 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
+
+import wallyson.lima.earthquakewatcher.Model.EarthQuake;
 import wallyson.lima.earthquakewatcher.Util.Constants;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -50,8 +57,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         queue = Volley.newRequestQueue(this);
-
-        getEarthQuakes();
     }
 
 
@@ -129,6 +134,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sidney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+        getEarthQuakes();
     }
 
     @Override
@@ -149,6 +156,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Get all Earthquake Objects
     public void getEarthQuakes() {
+        final EarthQuake earthQuake = new EarthQuake();
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Constants.URL,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -167,6 +176,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 double lon = coordinates.getDouble(0);
                                 double lat = coordinates.getDouble(1);
+
+                                earthQuake.setPlace(properties.getString("place"));
+                                earthQuake.setType(properties.getString("type"));
+                                earthQuake.setTime(properties.getLong("time"));
+                                earthQuake.setMagnitude(properties.getDouble("mag"));
+                                earthQuake.setDetailLink(properties.getString("detail"));
+
+                                java.text.DateFormat dateFormat = java.text.DateFormat.getInstance();
+                                String formattedDate = dateFormat.format(new Date(Long.valueOf(properties.getLong("time"))).getTime());
+
+                                MarkerOptions markerOptions = new MarkerOptions();
+                                BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
+                                markerOptions.icon(icon);
+
+                                markerOptions.title(earthQuake.getPlace());
+                                markerOptions.position(new LatLng(lat, lon));
+
+                                Marker marker = mMap.addMarker(markerOptions);
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 1));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
