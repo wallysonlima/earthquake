@@ -3,6 +3,7 @@ package wallyson.lima.earthquakewatcher.UI;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
@@ -18,7 +19,7 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
         this.context = context;
 
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = layoutInflater.inflate(R.layout.custom_info_window);
+        view = layoutInflater.inflate(R.layout.custom_info_window, null);
     }
 
     @Override
@@ -28,6 +29,11 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoContents(Marker marker) {
-        return null;
+        TextView title = view.findViewById(R.id.winTitle);
+        title.setText(marker.getTitle());
+
+        TextView magnitude = view.findViewById(R.id.magnitude);
+        magnitude.setText(marker.getSnippet());
+        return view;
     }
 }
