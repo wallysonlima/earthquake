@@ -57,6 +57,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         queue = Volley.newRequestQueue(this);
+
+        getEarthQuakes();
     }
 
 
@@ -130,12 +132,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sidney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
-        getEarthQuakes();
     }
 
     @Override
@@ -192,8 +189,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 markerOptions.title(earthQuake.getPlace());
                                 markerOptions.position(new LatLng(lat, lon));
+                                markerOptions.snippet("Magnitude: " +
+                                        earthQuake.getMagnitude() + "\n" +
+                                        "Date: " + formattedDate);
 
                                 Marker marker = mMap.addMarker(markerOptions);
+                                marker.setTag(earthQuake.getDetailLink());
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 1));
                             }
                         } catch (JSONException e) {
