@@ -220,7 +220,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(getApplicationContext(), marker.getTag().toString(), Toast.LENGTH_LONG).show();
+
+        getQuakeDetails(marker.getTag().toString());
+        //Toast.makeText(getApplicationContext(), marker.getTag().toString(), Toast.LENGTH_LONG).show();
+    }
+
+    private void getQuakeDetails(String url) {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response ) {
+                String detailsUrl = "";
+
+                try {
+                    JSONObject properties = response.getJSONObject("properties");
+                    JSONObject products = response.getJSONObject("products");
+                    JSONArray geoserve = products.getJSONArray("geoserve");
+
+                    for( int i = 0; i < geoserve.length(); i++) {
+                        JSONObject geoservObject = geoserve.getJSONObject(i);
+                        JSONObject contentObj = geoservObject.getJSONObject("contents");
+                        JSONObject geoJsonObj = contentObj.getJSONObject("geoserve.json");
+
+                        detailsUrl = geoJsonObj.getString("url");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        queue.add(jsonObjectRequest);
     }
 
     @Override
