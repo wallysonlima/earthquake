@@ -2,6 +2,7 @@ package wallyson.lima.earthquakewatcher;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -55,6 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private RequestQueue queue;
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
+    private Button showListBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,9 +229,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-
         getQuakeDetails(marker.getTag().toString());
-        //Toast.makeText(getApplicationContext(), marker.getTag().toString(), Toast.LENGTH_LONG).show();
     }
 
     private void getQuakeDetails(String url) {
@@ -241,16 +241,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 try {
                     JSONObject properties = response.getJSONObject("properties");
-                    JSONObject products = response.getJSONObject("products");
+                    JSONObject products = properties.getJSONObject("products");
                     JSONArray geoserve = products.getJSONArray("geoserve");
 
                     for( int i = 0; i < geoserve.length(); i++) {
-                        JSONObject geoservObject = geoserve.getJSONObject(i);
-                        JSONObject contentObj = geoservObject.getJSONObject("contents");
+                        JSONObject geoserveObj = geoserve.getJSONObject(i);
+
+                        JSONObject contentObj = geoserveObj.getJSONObject("contents");
                         JSONObject geoJsonObj = contentObj.getJSONObject("geoserve.json");
 
                         detailsUrl = geoJsonObj.getString("url");
                     }
+
+                    getMoreDetails(detailsUrl);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -278,14 +281,54 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         TextView popList = view.findViewById(R.id.popList);
                         WebView htmlPop = view.findViewById(R.id.htmlWebView);
 
-                        
+                        StringBuilder stringBuilder = new StringBuilder();
+
+                        try {
+                            JSONArray cities = response.getJSONArray("cities");
+
+                            for( int i = 0; i < cities.length(); i++ ) {
+                                JSONObject citiesObj = cities.getJSONObject(i);
+
+                                stringBuilder.append("City: " + citiesObj.getString("name") +
+                                        "\n" + "Distance: " + citiesObj.getString("distance") +
+                                        "\n" + "Population: " + citiesObj.getString("population"));
+
+                                stringBuilder.append("\n\n");
+                            }
+
+                            popList.setText(stringBuilder);
+
+                            dismissButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            dismissButtonTop.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            dialogBuilder.setView(view);
+                            dialog = dialogBuilder.create();
+                            dialog.show();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
             }
-        })
+        });
+
+        queue.add(jsonObjectRequest);
     }
 
     @Override

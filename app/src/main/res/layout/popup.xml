@@ -7,10 +7,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="5dp">
 
             <TextView
                 android:id="@+id/popTitle"
@@ -29,7 +35,7 @@
                 android:layout_below="@+id/popTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
+                android:layout_marginBottom="20dp"
                 />
 
             <Button
@@ -37,8 +43,9 @@
                 android:layout_alignBottom="@+id/popListTitle"
                 android:layout_alignParentRight="true"
                 android:background="@android:drawable/ic_menu_close_clear_cancel"
-                android:layout_width="40dp"
-                android:layout_height="40dp" />
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginRight="20dp"/>
 
             <TextView
                 android:id="@+id/popList"
@@ -52,8 +59,7 @@
                 android:id="@+id/htmlWebView"
                 android:layout_below="@+id/popList"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_height="wrap_content">
             </WebView>
 
             <Button
@@ -67,5 +73,6 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorAccent"/>
         </RelativeLayout>
+        </android.support.v7.widget.CardView>
     </ScrollView>
 </LinearLayout>
