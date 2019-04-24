@@ -1,6 +1,7 @@
 package wallyson.lima.earthquakewatcher;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,6 +12,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -48,6 +53,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager locationManager;
     private LocationListener locationListener;
     private RequestQueue queue;
+    private AlertDialog.Builder dialogBuilder;
+    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -256,6 +263,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         queue.add(jsonObjectRequest);
+    }
+
+    public void getMoreDetails(String url) {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                         dialogBuilder = new AlertDialog.Builder(MapsActivity.this);
+                         View view = getLayoutInflater().inflate(R.layout.popup, null);
+
+                        Button dismissButton = view.findViewById(R.id.dismissPop);
+                        Button dismissButtonTop = view.findViewById(R.id.dismissPopTop);
+                        TextView popList = view.findViewById(R.id.popList);
+                        WebView htmlPop = view.findViewById(R.id.htmlWebView);
+
+                        
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        })
     }
 
     @Override
