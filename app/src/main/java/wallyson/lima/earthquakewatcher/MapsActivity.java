@@ -57,6 +57,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
     private Button showListBtn;
+    private BitmapDescriptor[] iconColors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        iconColors = new BitmapDescriptor[] {
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE),
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN),
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW),
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN),
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE),
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA),
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE),
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)
+        };
 
         queue = Volley.newRequestQueue(this);
 
@@ -199,8 +211,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 String formattedDate = dateFormat.format(new Date(Long.valueOf(properties.getLong("time"))).getTime());
 
                                 MarkerOptions markerOptions = new MarkerOptions();
-                                BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
-                                markerOptions.icon(icon);
+                                markerOptions.icon(iconColors[Constants.randomInt(iconColors.length, 0)]);
 
                                 markerOptions.title(earthQuake.getPlace());
                                 markerOptions.position(new LatLng(lat, lon));
