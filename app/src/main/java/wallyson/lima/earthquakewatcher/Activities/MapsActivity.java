@@ -2,6 +2,7 @@ package wallyson.lima.earthquakewatcher.Activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -65,6 +66,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        showListBtn = findViewById(R.id.showListBtn);
+
+        showListBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MapsActivity.this, QuakesListActivity.class));
+            }
+        });
 
         iconColors = new BitmapDescriptor[] {
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE),
